@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const mongoDB = "mongodb://localhost/First_App";
+const mongoDB = "mongodb://localhost:27017/lat-express";
 
 // koneksi database
 mongoose

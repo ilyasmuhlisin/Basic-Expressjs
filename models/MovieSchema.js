@@ -7,7 +7,9 @@ const MovieSchema = new mongoose.Schema({
     trim: true,
   },
   released_on: {
-    type: Date,
+    // type: Date,
+    // supaya tanggal sesuai ganti string
+    type: String,
     required: true,
     trim: true,
   },
