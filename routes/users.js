@@ -1,20 +1,22 @@
 var express = require("express");
 var router = express.Router();
 const bcrypt = require("bcrypt");
+const passport = require("passport");
 // router.get('/', function(req, res, next) {
 //   res.send('respond with a resource');
 // });
-
+const { forwardAuth } = require("../config/auth");
 // import userSchema
 const User = require("../models/UserSchema");
 
 // get login
-router.get("/login", function (req, res, next) {
+//middleware untuk jika sudah login tidak perlu login lagi langsung ke dashboard
+router.get("/login",forwardAuth, function (req, res, next) {
   res.render("login", { title: "Halaman login" });
 });
 
 // post login
-router.post("/login", function (req, res, next) {
+router.post("/login", forwardAuth, function (req, res, next) {
   const { email, password } = req.body;
   console.log(req.body);
 
@@ -32,42 +34,47 @@ router.post("/login", function (req, res, next) {
       password,
     });
   } else {
+    passport.authenticate("local", {
+      successRedirect: "/dashboard",
+      failureRedirect: "/auth/login",
+      failureFlash: true,
+    })(req, res, next);
     // cek email sudah terdaftar
     //perintah bcryopt compaire jadi menggukana async
-    User.findOne({ email: email })
-      .then(async (user) => {
-        if (user) {
-          if (await bcrypt.compare(password, user.password)) {
-            console.log(user);
-            console.log("cek" + password, "||", user.password);
-            res.redirect("/dashboard");
-          } else {
-            errors.push({ msg: "Password Salah" });
-            console.log("Password Salah");
-            res.render("login", { errors });
-          }
-        } //jika email belum terdaftar
-        else {
-          // error jika email ga ada
-          errors.push({ msg: "Email Salah" });
-          console.log("Email Salah");
-          res.render("login", errors);
-        }
-      })
-      .catch((err) => {
-        errors.push({ msg: "Internal Server Error" });
-        console.log("Internal Server Error" + err.message);
-        res.render("login", { errors });
-      });
+    // User.findOne({ email: email })
+    //   .then(async (user) => {
+    //     if (user) {
+    //       if (await bcrypt.compare(password, user.password)) {
+    //         console.log(user);
+    //         console.log("cek" + password, "||", user.password);
+    //         res.redirect("/dashboard");
+    //       } else {
+    //         errors.push({ msg: "Password Salah" });
+    //         console.log("Password Salah");
+    //         res.render("login", { errors });
+    //       }
+    //     } //jika email belum terdaftar
+    //     else {
+    //       // error jika email ga ada
+    //       errors.push({ msg: "Email Salah" });
+    //       console.log("Email Salah");
+    //       res.render("login", errors);
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     errors.push({ msg: "Internal Server Error" });
+    //     console.log("Internal Server Error" + err.message);
+    //     res.render("login", { errors });
+    //   });
   }
 });
 
 // get register
-router.get("/register", function (req, res, next) {
+router.get("/register", forwardAuth, function (req, res, next) {
   res.render("register", { title: "Halaman register" });
 });
 // post register
-router.post("/register", function (req, res, next) {
+router.post("/register", forwardAuth, function (req, res, next) {
   const { name, email, password, password2 } = req.body;
   console.log(req.body);
 
@@ -124,6 +131,8 @@ router.post("/register", function (req, res, next) {
 });
 // logout
 router.get("/logout", function (req, res) {
+  //menghapus session
+  req.logout();
   res.redirect("/");
 });
 

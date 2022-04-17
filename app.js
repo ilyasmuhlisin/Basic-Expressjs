@@ -4,6 +4,10 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 
+const passport = require("passport");
+const flash = require("connect-flash")
+const session = require("express-session")
+
 // menambahkan modul layout
 var expressLayout = require("express-ejs-layouts");
 
@@ -15,6 +19,19 @@ var usersRouter = require("./routes/users");
 var moviesRouter = require("./routes/movies");
 
 var app = express();
+// configuration passport
+require("./config/passport")(passport);
+// express session
+app.use(session({
+  secret: 'secret',
+  resave: true,
+  saveUninitialized: true,
+}))
+//config passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+// connect to flash
+app.use(flash());
 
 // view engine setup
 // app.set("views", path.join(__dirname, "views"));
@@ -29,19 +46,25 @@ database.connection.on(
 
 app.use(logger("dev"));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({
+  extended: true
+}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
-
+//global variable errors on messages
+app.use((req, res, next) => {
+  res.locals.error = req.flash("error");
+  next()
+})
 app.use("/", indexRouter);
 app.use("/auth", usersRouter);
 // memanggil path file
 app.use("/movies", moviesRouter);
 
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  next(createError(404));
-});
+// // catch 404 and forward to error handler
+// app.use(function (req, res, next) {
+//   next();
+// });
 
 // error handler
 app.use(function (err, req, res, next) {

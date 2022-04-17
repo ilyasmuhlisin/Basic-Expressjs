@@ -3,8 +3,10 @@ var router = express.Router();
 var moment = require("moment");
 var Movie = require("../models/MovieSchema");
 
+const { cekAuth } = require("../config/auth");
+
 // get All Movies
-router.get("/", function (req, res, next) {
+router.get("/", cekAuth, function (req, res, next) {
   let ListMovies = [];
   //memanggil data movies
   Movie.find(function (err, movies) {
@@ -33,12 +35,12 @@ router.get("/", function (req, res, next) {
 });
 
 // create movies
-router.get("/create", function (req, res, next) {
+router.get("/create", cekAuth, function (req, res, next) {
   res.render("movie/createMovies", { title: "Halaman Create Movies" });
 });
 
 // update
-router.get("/update/:movieId", function (req, res, next) {
+router.get("/update/:movieId", cekAuth, function (req, res, next) {
   Movie.findById(req.params.movieId, function (err, movieInfo) {
     var newDate = moment(movieInfo.released_on).format("YYYY-MM-DD");
     if (movieInfo) {
@@ -57,7 +59,7 @@ router.get("/update/:movieId", function (req, res, next) {
 });
 
 // action create
-router.post("/create", function (req, res) {
+router.post("/create", cekAuth, function (req, res) {
   const { name, date } = req.body;
   console.log(req.body);
   let errors = [];
@@ -88,7 +90,7 @@ router.post("/create", function (req, res) {
 
 // action update
 // router.put("/update/:movieId", function (req, res) {});
-router.post("/update", function (req, res) {
+router.post("/update", cekAuth, function (req, res) {
   let errors = [];
   Movie.findByIdAndUpdate(
     req.body.id,
@@ -115,7 +117,7 @@ router.post("/update", function (req, res) {
 
 // action delete
 // router.delete("/delete/:movieId", function (req, res) {});
-router.get("/delete/:movieId", function (req, res) {
+router.get("/delete/:movieId", cekAuth, function (req, res) {
   Movie.findByIdAndDelete(req.params.movieId, function () {
     res.redirect("/movies");
   });

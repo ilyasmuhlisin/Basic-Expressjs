@@ -6,9 +6,9 @@
   <div class="card-header"><%= data.name %></div>
   <div class="card-body">
     <h5 class="card-title">Tanggal Tayang : <%= data.released_on %></h5>
-    <a href="movies/update/<%= data.id%>" class="btn btn-primary">Edit</a>
+    <a href="movies/update/<%= data.id%>" class="btn btn-warning">Edit</a>
     <a
-      class="btn btn-primary"
+      class="btn btn-danger"
       data-bs-toggle="collapse"
       href="#data<%= data.id%>"
       role="button"
@@ -22,7 +22,7 @@
 <div class="collapse" id="data<%= data.id%>">
   <div class="card card-body">
     Apakah anda yakin untuk menghapus film <%= data.name %> ?
-    <a href="movies/delete/<%= data.id%>" class="btn btn-primary">Delete</a>
+    <a href="movies/delete/<%= data.id%>" class="btn btn-danger">Delete</a>
   </div>
 </div>
 <% } %>
